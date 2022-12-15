@@ -2,6 +2,7 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqlite_curso/core/data/data_general_constants.dart';
 import 'package:sqlite_curso/features/produtos/data/data_produtos_constants.dart';
+import 'package:sqlite_curso/features/produtos/domain/entities/produto_entity.dart';
 
 //? CLASSE DE FONTE DE DADOS PARA TRABALHAR COM OS PRODUTOS DO APP
 
@@ -34,5 +35,28 @@ class ProdutosSqliteDatasource {
 
       version: kDATABASE_VERSION,
     );
+  }
+
+  //? METODO DE CRIAÇÃO DO REGISTRO - PRIMEIRO METODO CRUD
+  //* recebe os dados como argumento do ProdutoEntity
+  Future create(ProdutoEntity produto) async {
+    try {
+      //* PRIMEIRO PASSO É OBTER A BASE DE DADOS
+      final Database db = await _getDatabase();
+
+      produto.produtoID =
+          await db.rawInsert('''insert into $kPRODUTOS_TABLE_NAME(
+        $kPRODUTOS_COLUMN_NOME, $kPRODUTOS_COLUMN_DESCRICAO,
+        $kPRODUTOS_COLUMN_VALOR)
+        VALUES(
+          //? INSERINDO OS VALOR DE ACORDO COM OS ARGUMENTOS RECEBIDOS
+          '${produto.nome}',
+          '${produto.descricao}',
+          '${produto.valor}'
+        )
+       ''');
+    } catch (ex) {
+      return;
+    }
   }
 }
